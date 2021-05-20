@@ -6,7 +6,7 @@
 /*   By: hmorishi <hmorishi@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/19 14:23:29 by hmorishi          #+#    #+#             */
-/*   Updated: 2021/05/19 14:24:21 by hmorishi         ###   ########.fr       */
+/*   Updated: 2021/05/20 14:58:51 by hmorishi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,13 @@
 
 int	main(void)
 {
-	printf("p0 % .3s\n", "cccc");
+	/*printf("p0 % .3s\n", "cccc");
 	ft_printf("p0 % .3s\n", "cccc");
 	printf("pp %.50d\n", 10000);
-	ft_printf("pp %.50d\n", 10000);
+	ft_printf("pp %.50d\n", 10000);*/
 	printf("p1 %.4s\n", "cccc");
 	ft_printf("p1 %.4s\n", "cccc");
-	printf("p2 %.10s\n", "cccc");
+	/*printf("p2 %.10s\n", "cccc");
 	ft_printf("p2 %.10s\n", "cccc");
 	printf("p3 %.4s\n", NULL);
 	ft_printf("p3 %.4s\n", NULL);
@@ -157,5 +157,6 @@ int	main(void)
     printf("p77 ret = %d\n", printf("%%p::[%1.50d]\n", 8473));
     ft_printf("p77 ret = %d\n", printf("%%p::[%0100.50d]\n", 8473));
     printf("p78 ret = %d\n", printf("%%p::[%0100.50d]\n", 8473));
-    ft_printf("p78 ret = %d\n", printf("%%p::[%0100.50d]\n", 8473));
+    ft_printf("p78 ret = %d\n", printf("%%p::[%0100.50d]\n", 8473));*/
+	return (0);
 }
