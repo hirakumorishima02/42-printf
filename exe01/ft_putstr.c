@@ -1,40 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_printf.c                                        :+:      :+:    :+:   */
+/*   ft_putstr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hmorishi <hmorishi@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/21 13:40:00 by hmorishi          #+#    #+#             */
-/*   Updated: 2021/05/24 16:54:00 by hmorishi         ###   ########.fr       */
+/*   Created: 2021/05/24 16:34:34 by hmorishi          #+#    #+#             */
+/*   Updated: 2021/05/24 16:34:41 by hmorishi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "header.h"
 
-int	ft_printf(const char * restrict format, ...)
+int	ft_putstr(char *str)
 {
-	char 	*itr;
-	int		res;
-	t_args	args;
-	va_list	ap;
-	
-	itr = (char *)format;
-	if (!itr)
+	int	res;
+
+	if (!str)
 		return (0);
 	res = 0;
-	va_start(ap, format);
-	while (*itr)
+	while(*str)
 	{
-		if (*itr == '%')
-		{
-			itr = read_args(&args, itr);
-			res += ft_put_conv(&args, ap);
-			continue;
-		}
-		res += ft_putchar(*itr);
-		itr++;
+		res += ft_putchar(*str);
+		str++;
 	}
-	va_end(ap);
 	return (res);
 }

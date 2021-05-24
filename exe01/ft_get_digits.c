@@ -1,40 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_printf.c                                        :+:      :+:    :+:   */
+/*   ft_get_digits.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hmorishi <hmorishi@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/21 13:40:00 by hmorishi          #+#    #+#             */
-/*   Updated: 2021/05/24 16:54:00 by hmorishi         ###   ########.fr       */
+/*   Created: 2021/05/24 16:38:35 by hmorishi          #+#    #+#             */
+/*   Updated: 2021/05/24 16:38:42 by hmorishi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "header.h"
 
-int	ft_printf(const char * restrict format, ...)
+int		ft_get_digits(int	d)
 {
-	char 	*itr;
-	int		res;
-	t_args	args;
-	va_list	ap;
-	
-	itr = (char *)format;
-	if (!itr)
-		return (0);
-	res = 0;
-	va_start(ap, format);
-	while (*itr)
+	int	digits;
+
+	if (d == INT_MIN)
+		return (11);
+	digits = 0;
+	if (d < 0)
 	{
-		if (*itr == '%')
-		{
-			itr = read_args(&args, itr);
-			res += ft_put_conv(&args, ap);
-			continue;
-		}
-		res += ft_putchar(*itr);
-		itr++;
+		digits++;
+		d *= -1;
 	}
-	va_end(ap);
-	return (res);
+	while (d / 10)
+	{
+		d /= 10;
+		digits++;
+	}
+	digits++;
+	return (digits);
 }
