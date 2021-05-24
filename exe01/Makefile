@@ -4,7 +4,7 @@ test:
 	bash test.sh
 
 printf: ft_printf.c
-	gcc ft_printf.c -D TEST -o printf
+	gcc -Wno-format ft_printf.c -D TEST -o printf
 
 ft_printf: ft_printf.c
 	gcc ft_printf.c -D TEST -D FT_PRINTF -o ft_printf
