@@ -6,7 +6,7 @@
 /*   By: hmorishi <hmorishi@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/21 13:40:00 by hmorishi          #+#    #+#             */
-/*   Updated: 2021/05/21 17:05:35 by hmorishi         ###   ########.fr       */
+/*   Updated: 2021/05/24 14:34:24 by hmorishi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,6 +148,7 @@ char	*read_args(t_args *args, char *itr)
 	itr++;
 	while (*itr)
 	{
+		initialize_args(args);
 		//width
 		if (ft_isdigit(*itr))
 		{
@@ -166,7 +167,7 @@ char	*read_args(t_args *args, char *itr)
 		{
 			args->has_precision = 1;
 			args->precision = ft_atoi(itr);
-			itr += ft_get_digits(args->width);
+			itr += ft_get_digits(args->precision);
 		}
 		//dxs
 		if (ft_strchr(*itr, CONV))
@@ -272,7 +273,13 @@ res = printf(__VA_ARGS__);
 int	main(void)
 {
 	int	res;
-	F("[%s]\n", "hoge");
+	F("1:[%s]\n", "hoge");
+	F("2:[%9.4s]\n", "hoge");
+	F("3:[%3.2s]\n", "hoge");
+	F("4:[%10.4s]\n", "hoge");
+	F("5:[%0.5s]\n", "hoge");
+	F("6:[%s]\n", NULL);
+	F("6:[%s]\n", "                       ");
 	return (0);
 }
 #endif
