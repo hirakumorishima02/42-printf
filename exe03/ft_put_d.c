@@ -6,7 +6,7 @@
 /*   By: hmorishi <hmorishi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/26 14:39:29 by hmorishi          #+#    #+#             */
-/*   Updated: 2021/05/26 16:12:53 by hmorishi         ###   ########.fr       */
+/*   Updated: 2021/05/26 16:36:17 by hmorishi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,13 @@ static int ft_puti(int d, int padding)
     {
         res += ft_putchar('-');
         while (padding-- > 0)
-            ft_putchar('0');
+            res += ft_putchar('0');
         res += ft_putstr("2147483648");
         return (res);
     }
     if (d < 0)
     {
-        res++;
+        res += ft_putchar('-');
         d *= -1;
     }
     while (padding-- > 0)
