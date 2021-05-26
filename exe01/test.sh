@@ -4,4 +4,4 @@ make printf
 ./printf > printf.txt
 diff -a --suppress-common-lines ft_printf.txt printf.txt
 make clean
-#rm ft_printf.txt printf.txt
+rm ft_printf.txt printf.txt
