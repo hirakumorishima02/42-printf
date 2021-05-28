@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_put_x.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hmorishi <hmorishi@student.42tokyo.jp>     +#+  +:+       +#+        */
+/*   By: hmorishi <hmorishi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/24 16:40:30 by hmorishi          #+#    #+#             */
-/*   Updated: 2021/05/24 16:41:41 by hmorishi         ###   ########.fr       */
+/*   Updated: 2021/05/28 15:41:40 by hmorishi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static int		ft_get_digits_x(unsigned int	ud)
 	int	digits;
 
 	digits = 0;
-	while (ud / 16)
+	while (ud / 16) 
 	{
 		ud /= 16;
 		digits++;
