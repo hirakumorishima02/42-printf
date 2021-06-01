@@ -5,110 +5,80 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: hmorishi <hmorishi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/25 15:21:54 by event             #+#    #+#             */
-/*   Updated: 2021/06/01 15:42:47 by hmorishi         ###   ########.fr       */
+/*   Created: 2021/06/01 14:07:15 by hmorishi          #+#    #+#             */
+/*   Updated: 2021/06/01 15:55:00 by hmorishi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <stdarg.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <limits.h>
 
 #define CONV "dxs"
 
 #ifdef TEST
-
 #ifdef FT_PRINTF
 #define F(...) \
-res = ft_printf(__VA_ARGS__);
+    res = ft_printf(__VA_ARGS__);
 #else
 #define F(...) \
-res = printf(__VA_ARGS__);
+    res = printf(__VA_ARGS__);
 #endif
 
-typedef struct  s_args
+typedef struct s_args
 {
-    int c;
     int width;
     int has_width;
     int precision;
     int has_precision;
-}               t_args;
-
-int ft_strlen(char *str)
-{
-    int res;
-
-    if (!str)
-        return (0);
-    res = 0;
-    while (*str++)
-        res++;
-    return (res);
-}
+    int c;
+}       t_args;
 
 int ft_putchar(char c)
 {
     return (write(1, &c, 1));
 }
 
-int ft_putstr(char *str)
+int ft_putstr(char  *s)
 {
     int res;
 
-    if (!str)
-        return (0);
     res = 0;
-    while (*str)
+    while (*s)
     {
-        res += ft_putchar(*str);
-        str++;
+        res += ft_putchar(*s);
+        s++;
     }
     return (res);
 }
 
-int ft_puti(int d, int padding)
+int ft_strlen(char *s)
 {
     int res;
-    
+
     res = 0;
-    if (d == INT_MIN)
+    while (*s)
     {
-        res += ft_putchar('-');
-        while (padding-- > 0)
-            res += ft_putchar('0');
-        res += ft_putstr("2147483648");
-        return (res);
+        s++;
+        res++;
     }
-    if (d < 0)
-    {
-        res += ft_putchar('-');
-        d *= -1;
-    }
-    while (padding-- > 0)
-        res += ft_putchar('0');
-    if (d / 10)
-        res += ft_puti(d / 10, padding);
-    res += ft_putchar((d % 10) + '0');
     return (res);
 }
 
-int ft_putx(unsigned int x, int padding)
+void    initialize_args(t_args    *args)
 {
-    int res;
-    
-    res = 0;
-    while (padding-- > 0)
-        res += ft_putchar('0');
-    if (x / 16)
-        res += ft_putx(x / 16, padding);
-    if ((x % 16) >= 10)
-        res += ft_putchar('a' + ( x % 16) - 10);
-    else
-        res += ft_putchar((x % 16) + '0');
-    return (res);
+    args->width = 0;
+    args->has_width = 0;
+    args->precision = 0;
+    args->has_precision = 0;
+    args->c = 0;
+}
+
+int ft_skip(char    c)
+{
+    return ((c >= 9 && c <= 13) || c == 32);
 }
 
 int ft_isdigit(char c)
@@ -116,52 +86,38 @@ int ft_isdigit(char c)
     return (c >= '0' && c <= '9');
 }
 
-static int  ft_isspace(char c)
+int ft_atoi(char    *d)
 {
-    return ((c >= 9 && c <= 13) || c == 32);
-}
-
-int ft_atoi(char *str)
-{
-    long    res;
-    long    max;
-    int     sign;
+    long res;
+    long max;
+    int sign;
 
     res = 0;
-    max = INT_MAX;
-    while (ft_isspace(*str))
-        str++;
     sign = 1;
-    if (*str == '+' || *str == '-')
+    max = INT_MAX;
+    while (ft_skip(*d))
+        d++;
+    if (*d == '-' || *d == '+')
     {
-        sign = *str == '-' ? -1 : 1;
-        str++;
+        sign = (*d == '-') ? -1 : 1;
+        d++;
     }
-    while (ft_isdigit(*str))
+    while (ft_isdigit(*d))
     {
-        if (res < max - (*str - '0') / 10)
-            res = (*str - '0') + 10 * res;
+        if (res < max - (*d - '0') / 10)
+            res = res * 10 + (*d - '0');
         else
-            res = (sign == -1) ? (max + 1) : max;
-        str++;
+            res = (sign == -1) ? max + 1 : max;
+        d++;
     }
     return ((int)res * sign);
 }
 
-static void initialize_args(t_args  *args)
-{
-    args->c = 0;
-    args->width = 0;
-    args->has_width = 0;
-    args->precision = 0;
-    args->has_precision = 0;
-}
-
-int ft_get_digits(int d)
+int ft_get_digits(int   d)
 {
     int digits;
 
-    if (d == INT_MIN)
+    if (d = INT_MIN)
         return (11);
     digits = 0;
     if (d < 0)
@@ -171,31 +127,32 @@ int ft_get_digits(int d)
     }
     while (d / 10)
     {
-        d /= 10;
         digits++;
+        d /= 10;
     }
     digits++;
     return (digits);
 }
 
-int ft_get_digits_x(unsigned int x)
+int ft_get_digits_x(unsigned int   d)
 {
     unsigned int digits;
 
     digits = 0;
-    while (x / 16)
+    while (d / 16)
     {
-        x /= 16;
         digits++;
+        d /= 16;
     }
     digits++;
     return (digits);
 }
 
-char    *ft_strchr(char c, char *str)
+char *ft_strchr(const char *s, int c)
 {
-    if (!str)
-        return (NULL);
+    char *str;
+
+    str = (char *)s;
     while (*str)
     {
         if (*str == c)
@@ -205,7 +162,7 @@ char    *ft_strchr(char c, char *str)
     return (NULL);
 }
 
-char    *read_args(t_args *args, char *itr)
+char    *read_args(t_args   *args, char *itr)
 {
     if (!itr || *itr != '%')
         return (itr);
@@ -232,8 +189,8 @@ char    *read_args(t_args *args, char *itr)
             args->precision = ft_atoi(itr);
             itr += ft_get_digits(args->precision);
         }
-        // dxs
-        if (ft_strchr(*itr, CONV))
+        // c
+        if (ft_strchr(CONV, *itr))
         {
             args->c = *itr;
             itr++;
@@ -244,27 +201,53 @@ char    *read_args(t_args *args, char *itr)
     return (itr);
 }
 
-int ft_put_d(t_args *args, va_list ap)
+int ft_puti(int d, int  padding)
+{
+    int res;
+
+    res = 0;
+    if (d == INT_MIN)
+    {
+        res += ft_putchar('-');
+        while (padding-- > 0)
+            res += ft_putchar('0');
+        res += ft_putstr("2147483648");
+        return (res);
+    }
+    if (d < 0)
+    {
+        res += ft_putchar('-');
+        d *= -1;
+    }
+    while (padding-- > 0)
+        res += ft_putchar('0');
+    if (d / 10)
+        res += ft_puti(d / 10, padding);
+    res += ft_putchar((d % 10) + '0');
+    return (res);
+}
+
+int ft_put_d(t_args  *args, va_list  ap)
 {
     int width;
     int precision;
-    int d;
     int len;
-    int putlen;
     int padding;
+    int putlen;
     int res;
+    int d;
 
-    width = args->has_width ? args->width : 0;
-    precision = args->has_precision ? args->precision : 0;
     d = va_arg(ap, int);
+    width = (args->has_width) ? args->width : 0;
+    precision = (args->has_precision) ? args->precision : 0;
     len = ft_get_digits(d);
     if (args->has_precision && args->precision == 0 && d == 0)
         len = 0;
     if (d < 0)
-        padding = ((len - 1) < precision) ? precision - (len - 1) : 0;
+        padding = (len - 1 < precision) ? precision - (len - 1) : 0;
     else
-        padding = len < precision ? precision - len : 0;
-    putlen = len + padding;
+        padding = (len < precision) ? precision - len : 0;
+    putlen = padding + len;
     res = 0;
     while ((width - putlen) > 0)
     {
@@ -276,68 +259,84 @@ int ft_put_d(t_args *args, va_list ap)
     return (res + ft_puti(d, padding));
 }
 
-int ft_put_x(t_args *args, va_list ap)
+int ft_putx(unsigned int d, int  padding)
+{
+    int res;
+
+    res = 0;
+    while (padding-- > 0)
+        res += ft_putchar('0');
+    if (d / 16)
+        res += ft_putx(d / 16, padding);
+    if (d % 16 >= 10)
+        res += ft_putchar('a' + (d % 16) - 10);
+    else
+        res += ft_putchar((d % 16) + '0');
+    return (res);
+}
+
+int ft_put_x(t_args  *args, va_list  ap)
 {
     int width;
     int precision;
-    int padding;
-    int x;
     int len;
+    int padding;
     int putlen;
     int res;
+    int d;
 
-    width = args->has_width ? args->width : 0;
-    precision = args->has_precision ? args->precision : 0;
-    x = va_arg(ap, int);
-    len = ft_get_digits_x(x);
-    if (args->has_precision && args->precision == 0 && x == 0)
+    d = va_arg(ap, int);
+    width = (args->has_width) ? args->width : 0;
+    precision = (args->has_precision) ? args->precision : 0;
+    len = ft_get_digits_x(d);
+    if (args->has_precision && args->precision == 0 && d == 0)
         len = 0;
     padding = (len < precision) ? precision - len : 0;
-    putlen = len + padding;
-    while (width - putlen > 0)
+    putlen = padding + len;
+    res = 0;
+    while ((width - putlen) > 0)
     {
         res += ft_putchar(' ');
         width--;
     }
-    if (args->has_precision && args->precision == 0 & x == 0)
+    if (args->has_precision && args->precision == 0 && d == 0)
         return (res);
-    return (res + ft_putx(x, padding));
+    return (res + ft_putx(d, padding));
 }
 
-int ft_putstrl(char *str, int putlen)
+int ft_putstrl(char *s, int len)
 {
     int res;
     int i;
 
-    if (!str)
-        return (0);
     res = 0;
     i = 0;
-    while (*str && i < putlen)
+    while (s[i] && i < len)
     {
-        res += ft_putchar(*str);
+        res += ft_putchar(s[i]);
         i++;
-        str++;
     }
     return (res);
 }
-int ft_put_s(t_args *args, va_list ap)
+
+int ft_put_s(t_args  *args, va_list  ap)
 {
     int width;
     int precision;
     int len;
     int putlen;
     int res;
-    char    *s;
+    char *s;
 
     width = args->has_width ? args->width : 0;
     precision = args->has_precision ? args->precision : 0;
+    res = 0;
     s = va_arg(ap, char *);
     if (!s)
         s = "(null)";
     len = ft_strlen(s);
     if (args->has_precision)
-        putlen = (len > precision) ? precision : len;
+        putlen = len > precision ? precision : len;
     else
         putlen = len;
     while ((width - putlen) > 0)
@@ -347,29 +346,28 @@ int ft_put_s(t_args *args, va_list ap)
     }
     return (res + ft_putstrl(s, putlen));
 }
-int ft_put_conv(t_args *args, va_list ap)
+
+int ft_put_conv(t_args  *args, va_list  ap)
 {
     if (args->c == 'd')
-        return ft_put_d(args, ap);
+        return (ft_put_d(args, ap));
     if (args->c == 'x')
-        return ft_put_x(args, ap);
+        return (ft_put_x(args, ap));
     if (args->c == 's')
-        return ft_put_s(args, ap);
+        return (ft_put_s(args, ap));
     return (0);
 }
 
 int ft_printf(const char * restrict format, ...)
 {
+    int res;
     char    *itr;
-    int     res;
-    t_args  args;
     va_list ap;
+    t_args  args;
 
     itr = (char *)format;
-    if (!itr)
-        return (0);
-    res = 0;
     va_start(ap, format);
+    res = 0;
     while (*itr)
     {
         if (*itr == '%')
@@ -385,9 +383,9 @@ int ft_printf(const char * restrict format, ...)
     return (res);
 }
 
-int	main(void)
+int main(void)
 {
-	int	res;
+    int res;
 	F(">>>>>>>>>>>>>>>>>>>>STR<<<<<<<<<<<<<<<<<<\n");
 	F("1:[%s]\n", "hoge");
 	F("2:[%9.4s]\n", "hoge");
@@ -424,7 +422,7 @@ int	main(void)
 	F("34:[%5.d]\n", -12);
 	F("35:[%.d]\n", 43);
 	F("36:[%3.0d]\n", INT_MIN);
-	F(">>>>>>>>>>>>>>>>>>>>XXX<<<<<<<<<<<<<<<<<<\n");
+    F(">>>>>>>>>>>>>>>>>>>>XXX<<<<<<<<<<<<<<<<<<\n");
 	F("8:[%x]\n", 2147483647);
 	F("11:[%3.2x]\n", -2147483648);
 	F("12:[%10.5x]\n", 2147483647);
@@ -452,6 +450,7 @@ int	main(void)
 	F("34:[%5.x]\n", -12);
 	F("35:[%.x]\n", 43);
 	F("36:[%3.0x]\n", INT_MIN);
-	return (0);
+    return (0);
 }
+
 #endif
