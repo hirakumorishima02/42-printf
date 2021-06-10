@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   ft_printf.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hmorishi <hmorishi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: HirakuMorishima <HirakuMorishima@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/09 08:49:33 by hmorishi          #+#    #+#             */
-/*   Updated: 2021/06/09 11:34:59 by hmorishi         ###   ########.fr       */
+/*   Updated: 2021/06/10 11:59:38 by HirakuMoris      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
-// ft_convintのintzflagまでやった
+// ft_floatconvを作りかけ
 
 
 #include <unistd.h>
@@ -20,14 +20,19 @@
 #include <stdio.h>
 #include <limits.h>
 
-#ifdef TEST
-#ifdef FT_PRINTF
-#define F(...) \
-    res = ft_printf(__VA_ARGS__);
-#else
-#define F(...) \
-    res = printf(__VA_ARGS__);
-#endif
+# define BASE_10 "0123456789"
+# define BASE_16A "0123456789abcdef"
+# define BASE_16B "0123456789ABCDEF"
+# define BASE_08 "01234567"
+
+// #ifdef TEST
+// #ifdef FT_PRINTF
+// #define F(...) \
+//     res = ft_printf(__VA_ARGS__);
+// #else
+// #define F(...) \
+//     res = printf(__VA_ARGS__);
+// #endif
 
 typedef struct s_params
 {
@@ -83,6 +88,91 @@ int ft_strlen(const char *str)
     res = 0;
     while (*str++)
         res++;
+    return (res);
+}
+
+int ft_get_digits(int   d)
+{
+    int digits;
+
+    digits = 0;
+    while (d / 10)
+    {
+        d /= 10;
+        digits++;
+    }
+    digits++;
+    return (digits);
+}
+
+int ft_get_digits_base(size_t n, int base)
+{
+    if (n == 0)
+        return (0);
+    return (1 + ft_get_digits_base(n / base, base));
+}
+
+char *ft_givebase(char flg)
+{
+    if (flg == 'd')
+        return (BASE_10);
+    if (flg == 'h')
+        return (BASE_16A);
+    if (flg == 'H')
+        return (BASE_16B);
+    if (flg == 'o')
+        return (BASE_08);
+    else
+        return (0);
+}
+
+void bzero(void *s, size_t n)
+{
+    size_t i;
+    unsigned char *ptr;
+
+    ptr = (unsigned char *)s;
+    i = 0;
+    while (i < n)
+        ptr[i++] = '\0';
+}
+
+char *ft_calloc(size_t count, size_t size)
+{
+    void *res;
+    size_t sum;
+
+    sum = count * size;
+    if (!(res = malloc(sum)))
+        return (0);
+    ft_bzero(res, sum);
+    return (res);
+}
+
+char *ft_conv_base(size_t n, char flg)
+{
+    char *base;
+    char *res;
+    int baselen;
+    int len;
+    size_t cpy;
+
+    if (!(base = ft_givebase(flg)))
+        return (0);
+    baselen = ft_strlen(base);
+    len = 1 + nlen(n / baselen, baselen);
+    res = 0;
+    cpy = n;
+    if (!(res = ft_calloc(len + 1, sizeof(char))))
+        return (0);
+    res[len] = 0;
+    while (cpy)
+    {
+        res[--len] = base[cpy % baselen];
+        cpy /= baselen;
+    }
+    if (!res[0])
+        res[0] = '\0';
     return (res);
 }
 
@@ -186,18 +276,29 @@ int ft_atoi(char *d)
     return (res * sign);
 }
 
-int ft_get_digits(int   d)
+char *ft_itoa(int n)
 {
-    int digits;
+    int         digits;
+    char        *res;
+    unsigned int un;
 
-    digits = 0;
-    while (d / 10)
+    digits = ft_get_digits(n);
+    if (n < 0)
     {
-        d /= 10;
+        un = -(unsigned int)n;
         digits++;
     }
-    digits++;
-    return (digits);
+    else
+        un = n;
+    if (!(res = malloc(digits + 1)))
+        return (0);
+    res[digits] = 0;
+    if (n < 0)
+        res[0] = '-';
+    res[--digits] = (un % 10) + '0';
+    while (un /= 10)
+        res[--digits] = (un % 10) + '0';
+    return (res);
 }
 
 void ft_readwidth(char **itr)
@@ -388,9 +489,9 @@ int ft_dobonflag(int res, char type, char *d)
     else if ((g_ret->tagflag) && ((type == 'x') || (type == 'X')))
     {
         if ((type == 'x') && (*d != '0'))
-            res += ft_putstr("0x", -1);
+            res += ft_putstrl("0x", -1);
         else if ((type == 'X') && *d != '0')
-            res += ft_putstr("0X", -1);
+            res += ft_putstrl("0X", -1);
         g_ret->width -= 2;
     }
     return (res);
@@ -415,7 +516,7 @@ void ft_clearflag(char type, int *len)
 
 int ft_zeroprec(char *d)
 {
-    if (!g_ret->precision && *data == '0')
+    if (!g_ret->precision && *d == '0')
     {
         g_ret->zflag = 0;
         if (g_ret->plflag || g_ret->spflag)
@@ -457,7 +558,7 @@ void ft_intsflag(char *d, int len, char type)
     {
         while ((g_ret->precision--) - putlen > 0)
             putlen += ft_putchar('0');
-        putlen += ft_putstr(d, -1);
+        putlen += ft_putstrl(d, -1);
     }
     ft_padding(putlen);
     g_ret->printed += putlen;
@@ -477,7 +578,7 @@ void ft_intzflag(char *d, int len, char type)
         g_ret->printed += ft_putchar(' ');
     if (*d == '-')
     {
-        g_ret->printed += ft_putchar(*(data++));
+        g_ret->printed += ft_putchar(*(d++));
         g_ret->precision--;
         sign = 1;
     }
@@ -487,7 +588,34 @@ void ft_intzflag(char *d, int len, char type)
         g_ret->printed += ft_putchar('0');
     while ((g_ret->precision--) - (len - sign) > 0)
         g_ret->printed += ft_putchar('0');
-    g_ret->printed += ft_putstr(d, -1);
+    g_ret->printed += ft_putstrl(d, -1);
+    ft_free(d, sign);
+}
+
+void ft_width_prec(char *d, int len, char type)
+{
+    int sign;
+
+    sign = 0;
+    if (ft_zeroprec(d))
+        return ;
+    else
+    {
+        if (*d == '-')
+        {
+            g_ret->width--;
+            len--;
+            sign = 1;
+        }
+        else
+            g_ret->printed += ft_dobonflag(0, type, d);
+        ft_padding(ft_max(len));
+        if (*d == '-')
+            g_ret->printed += ft_putchar(*(d++));
+        while ((g_ret->precision--) - len > 0)
+            g_ret->printed += ft_putchar('0');
+        g_ret->printed += ft_putstrl(d, -1);
+    }
     ft_free(d, sign);
 }
 
@@ -500,8 +628,157 @@ void ft_convint(char *d, char type)
         ft_clearflag(type, &len);
     if (g_ret->sflag)
         ft_intsflag(d, len, type);
-    if (g_ret->zflag)
+    else if (g_ret->zflag)
         ft_intzflag(d, len, type);
+    else if ((g_ret->width > g_ret->precision) && g_ret->precision >= 0)
+        ft_width_prec(d, len, type);
+    else if (g_ret->width && g_ret->precision == -1)
+    {
+        ft_padding(len);
+        g_ret->printed += ft_dobonflag(0, type, d);
+        g_ret->printed += ft_putstrl(d, -1, 1);
+    }
+    else if (!(g_ret->precision == 0 && *d == '0'))
+    {
+        g_ret->printed += ft_dobonflag(0, type, d);
+        g_ret->printed += ft_putstrl(d, g_ret->precision -1);
+    }
+}
+
+void ft_convadr(char *d)
+{
+    int res;
+    int len;
+
+    len = ft_strlen(d);
+    if (g_ret->sflag);
+    {
+        res = ft_putstrl("0x", -1);
+        res += ft_putstrl(d, -1);
+    }
+    ft_padding(res);
+    g_ret->printed += res;
+}
+
+void ft_ntype(int *num)
+{
+    num = g_ret->ptr;
+}
+
+double ft_culsign(double n, char *res)
+{
+    if (n < 0)
+    {
+        res[0] = '-';
+        return (-n);
+    }
+    return (n);
+}
+
+size_t ft_strlcpy(char *dst, const char *src, size_t dstsize)
+{
+    size_t i;
+
+    i = 0;
+    if (!src)
+        return (0);
+    if (dstsize > 0)
+    {
+        while (src[i] && (i < dstsize - 1))
+        {
+            dst[i] = src[i];
+            i++;
+        }
+        dst[i] = '\0';
+        i = 0;
+    }
+    while (src[i])
+        i++;
+    return (i);
+}
+
+char *ft_strjoin(char const *s1, char const *s2)
+{
+    char *res;
+    size_t len;
+
+    len = ft_strlen(s1) + ft_strlen(s2);
+    if(!(res = malloc(len)))
+        return (0);
+    ft_strlcpy(res, s1, len);
+    ft_strlcpy(res, s2, len);
+    return (res);
+}
+
+int ft_dtoa(double n, char **intpart, char **decpart)
+{
+    char    res[2];
+    int     i;
+    int     x;
+    double  f;
+
+    if (!n)
+    {
+        *intpart = 0;
+        *decpart = 0;
+        return (0);
+    }
+    f = ft_culsign(n, res);
+    *intpart = ft_conv_base(f, 'd');
+    i = ft_strlen(*intpart);
+    f *= 10000000000000000;
+    *decpart = ft_conv_base(f, 'd');
+    *decpart = ft_strjoin(".", *decpart + i);
+    x = ft_strlen(*decpart);
+    while(*((*decpart) + x - 1) == '0')
+        *(*decpart + x--) = 0;
+    *intpart = ft_strjoin(res, *intpart);
+    return (i);
+}
+
+int ft_arrotondo(int len)
+{
+    int i;
+    char *check;
+
+    i = g_ret->precision;
+    if (!i)
+        check = 'C';
+    else
+        check = 0;
+    if (g_ret->decpart[i + 1] >= '5')
+    {
+        while (((!check) && (g_ret->decpart[i] = (g_ret->decpart[i] - '0' + 1) % 10 + '0') == '0'))
+            if (g_ret->decpart[--i] == '.')
+                check = 'C';
+        if (check)
+        {
+            while (((--len >= 0) && (g_ret->intpart[len] = (g_ret->intpart[len] - '0' + 1) % 10 + '0') == '0'));
+            if (len < 0)
+            {
+                check = ft_strjoin("1", g_ret->intpart);
+                free(g_ret->intpart);
+                g_ret->intpart = check;
+            }
+        }
+    }
+    return (1);
+}
+
+void ft_floatconv(int intlen)
+{
+    int offset;
+
+    if (ft_arrotondo(intlen) && !intlen)
+        return ;
+}
+
+void ft_bonus(char **itr)
+{
+    if (**itr == 'n')
+        ft_ntype(va_arg(g_ret->arg, int*));
+    else if (**itr == 'f')
+        ft_floatconv(ft_dtoa(va_arg(g_ret->arg, double), &(g_ret->intpart), &(g_ret->decpart)));
 }
 
 int ft_start_conv(char **itr)
@@ -517,14 +794,14 @@ int ft_start_conv(char **itr)
     else if (**itr == 'u' || **itr == 'x' || **itr == 'X')
         {
             if (**itr == 'u')
-                ft_convint(ft_stoa_b(va_arg(g_ret->arg, unsigned int), 'd'), 'd');
+                ft_convint(ft_conv_base(va_arg(g_ret->arg, unsigned int), 'd'), 'd');
             if (**itr == 'x')
-                ft_convint(ft_stoa_b(va_arg(g_ret->arg, unsigned int), 'h'), 'x');
+                ft_convint(ft_conv_base(va_arg(g_ret->arg, unsigned int), 'h'), 'x');
             if (**itr == 'X')
-                ft_convint(ft_stoa_b(va_arg(g_ret->arg, unsigned int), 'H'), 'X');
+                ft_convint(ft_conv_base(va_arg(g_ret->arg, unsigned int), 'H'), 'X');
         }
     else if (**itr == 'p')
-        ft_convadr(ft_stoa_b(va_arg(g_ret->arg, size_t), 'h'));
+        ft_convadr(ft_conv_base(va_arg(g_ret->arg, size_t), 'h'));
     else if (**itr == 'n' || **itr == 'f')
         ft_bonus(itr);
     else
@@ -571,11 +848,12 @@ int main(void)
 {
     int res;
 
-    ft_putstrl("-2147483648", 4);
+    printf("%s", ft_itoa(-2147483648));
     // F("%d\n", ft_get_digits(0));
     return (0);
 }
 
-#endif
+// #endif
+
 
 
